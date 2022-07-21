@@ -1,0 +1,47 @@
+services:
+  wordpress:
+    container_name: wordpress-container
+    image: wordpress:latest
+    ports:
+      - 80:80
+    environment:
+      - WORDPRESS_DB_HOST=mysql-container
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=password
+      - WORDPRESS_DB_NAME=wpdb
+      - WORDPRESS_TABLE_PREFIX=wpdb_
+    depends_on:
+      - mysql-container
+    networks:
+      - wp-network
+
+  mysql:
+    container_name: mysql-container
+    image: mysql:8.0.29
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root-password
+      - MYSQL_DATABASE=wpdb
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=password
+    networks:
+      - wp-network
+
+  phpmyadmin:
+    container_name: phpmyadmin-container
+    image: phpmyadmin:latest
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql-container
+      - PMA_PORT=3306
+    depends_on:
+      - mysql-container
+    networks:
+      - wp-network
+
+networks:
+  wp-network:
+    name: wp-network
